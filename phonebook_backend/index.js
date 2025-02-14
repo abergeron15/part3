@@ -26,6 +26,21 @@ const persons = [
   },
 ];
 
+app.get("/info", (request, response) => {
+  const requestTime = new Date();
+
+  response.send(
+    `Phonebook has info for ${
+      persons.length === 1 ? "1 person" : String(persons.length + " people")
+    }
+    <br />
+    <br />
+    ${requestTime}
+    `
+  );
+  console.log(response.getHeaders());
+});
+
 app.get("/api/persons", (request, response) => {
   response.json(persons);
   console.log("persons =", persons);
