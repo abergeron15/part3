@@ -26,6 +26,7 @@ let persons = [
   },
 ];
 
+// Info Page
 app.get("/info", (request, response) => {
   const requestTime = new Date();
 
@@ -41,11 +42,38 @@ app.get("/info", (request, response) => {
   console.log(response.getHeaders());
 });
 
+////////////
+// CRUD
+
+// Read ALL Persons
 app.get("/api/persons", (request, response) => {
   response.json(persons);
   console.log("persons =", persons);
 });
 
+// Create Person
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "name missing",
+    });
+  }
+
+  const person = {
+    name: body.name,
+    number: body.number,
+    id: Math.round(Math.random() * 1000000000),
+  };
+
+  persons = persons.concat(person);
+
+  response.json(person);
+  console.log(person);
+});
+
+// Read Person
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
   const person = persons.find((p) => p.id === id);
@@ -58,6 +86,7 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
+// Delete Person
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
   persons = persons.filter((p) => p.id !== id);
@@ -66,6 +95,7 @@ app.delete("/api/persons/:id", (request, response) => {
   console.log(`deleted person id ${id}`);
 });
 
+// Start app
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
