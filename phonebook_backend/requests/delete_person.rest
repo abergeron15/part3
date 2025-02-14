@@ -9,5 +9,5 @@ content-type: application/json
 
 {
   "name": "Testing",
-  "number": "39-44-2342342"
+  "number": ""
 }
