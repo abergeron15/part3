@@ -1,10 +1,10 @@
-DELETE http://localhost:3001/api/persons/1
+DELETE https://phonebook-backend-proud-dawn-7814.fly.dev/api/persons/649339285
 
 ### GET PERSONS
-GET http://localhost:3001/api/persons
+GET https://phonebook-backend-proud-dawn-7814.fly.dev/api/persons
 
 ### CREATE PERSON
-POST http://localhost:3001/api/persons
+POST https://phonebook-backend-proud-dawn-7814.fly.dev/api/persons
 content-type: application/json
 
 {
