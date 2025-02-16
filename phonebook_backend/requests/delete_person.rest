@@ -1,4 +1,4 @@
-DELETE https://phonebook-backend-proud-dawn-7814.fly.dev/api/persons/649339285
+DELETE https://phonebook-backend-proud-dawn-7814.fly.dev/api/persons/136277495
 
 ### GET PERSONS
 GET https://phonebook-backend-proud-dawn-7814.fly.dev/api/persons

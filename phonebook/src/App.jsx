@@ -117,7 +117,7 @@ const App = () => {
           .catch(error => {
             console.log(error)
             setNotification({
-              message: `could not update ${person.name}'s number`,
+              message: `could not update number`,
               type: 'error',
             })
             setTimeout(() => {
