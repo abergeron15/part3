@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const Person = require("./models/person");
 
 const app = express();
 
@@ -18,55 +19,45 @@ app.use(
         " " +
         tokens.status(req, res) +
         " " +
-        tokens.res(req, res, "content-length") +
+        (tokens.res(req, res, "content-length")
+          ? tokens.res(req, res, "content-length")
+          : "-") +
         " " +
         "-" +
         " " +
         tokens["response-time"](req, res) +
         " " +
         "ms " +
-        `{"name":"${req.body.name}","number":"${req.body.number}"}`,
+        (req.body.name
+          ? `{"name":"${req.body.name}","number":"${req.body.number}"}`
+          : ""),
     ];
   })
 );
 
-let persons = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
-  },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
-
 // Info Page
 app.get("/info", (request, response) => {
   const requestTime = new Date();
+  Person.find({})
+    .then((returnedPersons) => {
+      console.log(returnedPersons);
 
-  response.send(
-    `Phonebook has info for ${
-      persons.length === 1 ? "1 person" : String(persons.length + " people")
-    }
+      response.send(
+        `Phonebook has info for ${
+          returnedPersons.length === 1
+            ? "1 person"
+            : String(returnedPersons.length + " people")
+        }
     <br />
     <br />
     ${requestTime}
     `
-  );
-  console.log(response.getHeaders());
+      );
+      console.log(response.getHeaders());
+    })
+    .catch((error) => {
+      console.error("could not fetch info: ", error);
+    });
 });
 
 ////////////
@@ -74,8 +65,9 @@ app.get("/info", (request, response) => {
 
 // Read ALL Persons
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
-  console.log("persons =", persons);
+  Person.find({}).then((persons) => {
+    response.json(persons);
+  });
 });
 
 // Create Person
@@ -101,44 +93,38 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  if (persons.find((p) => p.name === body.name)) {
-    return response.status(400).json({
-      error: "name must be unique",
-    });
-  }
-
-  const person = {
+  const person = new Person({
     name: body.name,
     number: body.number,
-    id: String(Math.round(Math.random() * 1000000000)),
-  };
+  });
 
-  persons = persons.concat(person);
-
-  response.json(person);
-  console.log(person);
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 // Read Person
 app.get("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  const person = persons.find((p) => p.id == id);
-
-  if (person) {
-    response.json(person);
-    console.log(person);
-  } else {
-    response.status(404).end();
-  }
+  console.log(id);
+  Person.findById(id)
+    .then((person) => {
+      response.json(person);
+      console.log(person);
+    })
+    .catch((error) => {
+      console.error("could not get person:", error.message);
+      response.status(404).end();
+    });
 });
 
 // Delete Person
 app.delete("/api/persons/:id", (request, response) => {
   const id = request.params.id;
-  persons = persons.filter((p) => p.id !== id);
-
-  response.status(204).end();
-  console.log(`deleted person id ${id}`);
+  Person.findByIdAndDelete(id).then((deletedPerson) => {
+    response.status(204).end();
+    console.log(`deleted person id ${deletedPerson.id}`);
+  });
 });
 
 // Start app
