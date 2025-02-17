@@ -28,9 +28,10 @@ app.use(
         tokens["response-time"](req, res) +
         " " +
         "ms " +
-        (req.body.name
-          ? `{"name":"${req.body.name}","number":"${req.body.number}"}`
-          : ""),
+        "{" +
+        (req.body.name ? `"name":"${req.body.name}"` : "") +
+        (req.body.number ? `,"number":"${req.body.number}"}` : "") +
+        "}",
     ];
   })
 );
@@ -104,28 +105,67 @@ app.post("/api/persons", (request, response) => {
 });
 
 // Read Person
-app.get("/api/persons/:id", (request, response) => {
+app.get("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  console.log(id);
   Person.findById(id)
     .then((person) => {
-      response.json(person);
-      console.log(person);
+      if (person) {
+        response.json(person);
+        console.log(person);
+      } else {
+        response.status(404).end();
+      }
     })
-    .catch((error) => {
-      console.error("could not get person:", error.message);
-      response.status(404).end();
-    });
+    .catch((error) => next(error));
 });
 
 // Delete Person
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   const id = request.params.id;
-  Person.findByIdAndDelete(id).then((deletedPerson) => {
-    response.status(204).end();
-    console.log(`deleted person id ${deletedPerson.id}`);
-  });
+  Person.findByIdAndDelete(id)
+    .then((deletedPerson) => {
+      response.status(204).end();
+      console.log(`deleted person id ${deletedPerson.id}`);
+    })
+    .catch((error) => next(error));
 });
+
+// Update Person
+app.put("/api/persons/:id", (request, response, next) => {
+  const id = request.params.id;
+  const body = request.body;
+  const person = {
+    name: body.name,
+    number: body.number,
+  };
+
+  Person.findByIdAndUpdate(id, person, { new: true })
+    .then((updatedPerson) => {
+      console.log("updated person: ", updatedPerson);
+      response.json(updatedPerson);
+    })
+    .catch((error) => next(error));
+});
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+app.use(errorHandler);
 
 // Start app
 const PORT = process.env.PORT || 3001;

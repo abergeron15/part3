@@ -166,11 +166,11 @@ const App = () => {
     if (confirm(`Delete ${person.name}?`)) {
       personServices
         .del(person.id)
-        .then(deletedPerson => {
-          console.log('deleted', deletedPerson)
-          setPersons(persons.filter(p => p.id !== deletedPerson.id))
+        .then(() => {
+          console.log('deleted', person)
+          setPersons(persons.filter(p => p.id !== person.id))
           setNotification({
-            message: `deleted ${deletedPerson.name}`,
+            message: `deleted ${person.name}`,
             type: 'success',
           })
           setTimeout(() => {
