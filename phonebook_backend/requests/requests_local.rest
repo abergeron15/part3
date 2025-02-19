@@ -8,8 +8,8 @@ POST http://localhost:3001/api/persons
 content-type: application/json
 
 {
-  "name": "Testing",
-  "number": "123"
+  "name": "",
+  "number": "123123"
 }
 
 ### UPDATE PERSON
@@ -17,5 +17,6 @@ PUT http://localhost:3001/api/persons/67b362b19bffc6e7ce1d5202
 content-type: application/json
 
 {
-  "name": "Shoko Lokoz"
+  "name": "Shoko Loko",
+  "number": "11"
 }
