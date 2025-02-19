@@ -106,6 +106,8 @@ const App = () => {
           .then(updatedPerson => {
             console.log('updated', updatedPerson)
             setPersons(persons.map(p => p.id === updatedPerson.id ? updatedPerson : p))
+            setNewName('')
+            setNewNumber('')
             setNotification({
               message: `updated ${updatedPerson.name} with number ${updatedPerson.number}`,
               type: 'success'
@@ -115,9 +117,9 @@ const App = () => {
             }, 3000)
           })
           .catch(error => {
-            console.log(error)
+            console.log(error.response.data.error)
             setNotification({
-              message: `could not update number`,
+              message: error.response.data.error,
               type: 'error',
             })
             setTimeout(() => {
